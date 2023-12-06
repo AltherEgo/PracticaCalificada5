@@ -142,11 +142,36 @@ Respuesta: Necesitamos revisar el check de las clases, usamos split y en el step
 end
 ```
 3.	 Dado que es tedioso especificar un paso para cada película individual que deberíamos ver, agrega una definición de paso para que coincida con un paso como: “Then I should see the following movies".
+ ```ruby
+ Then(/^I should see the following movies$/) do |table|
+  rows = page.all('table#movies tbody tr')
+  expect(rows.count).to eq(table.hashes.count)
+  table.hashes.each do |movie|
+    expect(page).to have_content(movie['Movie Title'])
+    expect(page).to have_content(movie['Rating'])
+    expect(page).to have_content(movie['Release Date'])
+  end
+end
+```
+Respuesta: Necesitamos primero toda la vista, luego verificar si lo esperado es igual a lo que se tiene, finalmenete verificamos si en la página tenemos el contenido solicitado
 4.	Para el escenario all ratings selected sería tedioso utilizar And I should see para nombrar cada una de las películas. Eso restaría valor al objetivo de BDD de transmitir la intención de comportamiento de la historia del usuario. Para solucionar este problema, completa la definición de paso que coincida con los pasos del formulario: Then I should see all the movies  en movie_steps.rb. 
+ ```ruby
+ Then(/^I should see all the movies$/) do
+  rows = page.all('table#movies tbody tr')
+  expect(rows.count).to eq(Movie.count)
+end
+```
 Considera contar el número de filas en la tabla HTML para implementar estos pasos. Si ha 	calculado las filas como el número de filas de la tabla, puede usar la afirmación expect(rows).to 	eq value para fallar la prueba en caso de que los valores no coincidan.
-
+Respusta: de igual manera verificamos el contenido de toda la página
 5.	Utiliza tus nuevas definiciones de pasos para completar el escenario con todas las calificaciones seleccionadas. Todo funciona bien si todos los escenarios en filter_movie_list.feature pasan con todos los pasos en verde.
-
+ ```cucumber
+ Scenario: all ratings selected
+  Given I am on the RottenPotatoes home page
+  When I check the following ratings: G, PG, R
+  And I press "Refresh Page"
+  Then I should see all the movies
+```
+Respuesta : finalmente revisamos el feature y verifivamos para todo los escenarios
 **Parte 3**
 
 1.	Describa uno o más patrones de diseño que podrían ser aplicados al diseño del sistema.
